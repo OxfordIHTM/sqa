@@ -21,11 +21,12 @@ jobs:
       - name: Install system dependencies
         run: |
           apt-get update && apt-get install -y --no-install-recommends \
-          libxt6 libglpk-dev
+          libxt6 libglpk-dev libpoppler-cpp-dev \
+          libtesseract-dev libleptonica-dev tesseract-ocr-eng
           
       - name: Trust git repo
         run: |
-          git config --global --add safe.directory /__w/ihtm-targets-template/ihtm-targets-template
+          git config --global --add safe.directory /__w/sqa/sqa
           
       - name: Install packages from renv.lock (with cache)
         if: ${{ !env.ACT }}  
