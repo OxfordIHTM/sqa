@@ -65,6 +65,9 @@ read_sqa_strategy_p1 <- function(p1) {
     paste(collapse = "-")
 
   st_text <- df$X3 |>
+    stringr::str_remove_all(
+      pattern = "^[0-9]{1,}\\.[0-9]{1,}\\.[0-9]{1,}\\. |^[0-9]{1,}\\.[0-9]{1,}\\.[0-9]{1,} "
+    ) |>
     paste(collapse = " ") |>
     stringr::str_replace(pattern = "\\. ", replacement = ".; ")
 

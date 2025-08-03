@@ -25,7 +25,7 @@ jobs:
           
       - name: Trust git repo
         run: |
-          git config --global --add safe.directory /__w/ihtm-targets-template/ihtm-targets-template
+          git config --global --add safe.directory /__w/sqa/sqa
           
       - name: Install packages from renv.lock (with cache)
         if: ${{ !env.ACT }}  
