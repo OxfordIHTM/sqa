@@ -543,7 +543,7 @@ read_sqa_strategy_results_p6 <- function(df_text) {
     paste(collapse = " ") |>
     trimws() |>
     stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
-    stringr::str_replace_all(pattern = "\\s{2}", replacement = "\\s") |>
+    stringr::str_replace_all(pattern = "\\s{2}", replacement = " ") |>
     stringr::str_split(pattern = ";;") |>
     unlist() |>
     (\(x) c(x[1], x[1], x[1], x[1], x[2]))()
@@ -551,7 +551,7 @@ read_sqa_strategy_results_p6 <- function(df_text) {
   strategic_objective <- df$X2 |>
     paste(collapse = " ") |>
     stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
-    stringr::str_replace_all(pattern = "\\s{2}", replacement = "\\s") |>
+    stringr::str_replace_all(pattern = "\\s{2}", replacement = " ") |>
     stringr::str_split(pattern = ";;") |>
     unlist() |>
     (\(x) c(x[1], x[1], x[1], x[1], x[2]))()
@@ -629,6 +629,354 @@ read_sqa_strategy_results_p6 <- function(df_text) {
   )
 }
 
+
+#'
+#' Read SQA strategic results page 7
+#' 
+
+read_sqa_strategy_results_p7 <- function(df_text) {
+  ptext <- df_text[[7]] |>
+    remove_extra_lines() |>
+    stringr::str_replace_all(pattern = "^\\s{143}", replacement = ";;;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "^\\s{41}", replacement = ";;") |>
+    stringr::str_replace_all(pattern = "^\\s{17}", replacement = ";") |>
+    stringr::str_replace_all(pattern = "\\s{132,}", replacement = ";;;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "\\s{118,}", replacement = ";;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "\\s{84,}", replacement = ";;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "\\s{68,}", replacement = ";;;;;;;;") |>
+    stringr::str_replace_all(pattern = "\\s{50,}", replacement = ";;;;;;;") |>
+    stringr::str_replace_all(pattern = "\\s{23,}", replacement = ";;") |>
+    stringr::str_replace_all(pattern = "\\s{2,}", replacement = ";") |>
+    stringr::str_replace_all(pattern = "Prior$", replacement = "Prior;;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "monitoring$", replacement = "monitoring;;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "\\)$", replacement = ");;;;;;;;;;") |>
+    stringr::str_split(pattern = ";")
+
+  df <- ptext |>
+    do.call(rbind, args = _) |>
+    data.frame()
+
+  key_sector_challenge <- df$X1 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
+    stringr::str_replace_all(pattern = "\\s{2}", replacement = " ") |>
+    stringr::str_split(pattern = ";;") |>
+    unlist() |>
+    (\(x) c("", x[1], x[2], x[2]))()
+
+  strategic_objective <- df$X2 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
+    stringr::str_replace_all(pattern = "\\s{2}", replacement = " ") |>
+    stringr::str_replace_all(pattern = "\\sReview", replacement = ";;Review") |>
+    stringr::str_split(pattern = ";;") |>
+    unlist() |>
+    (\(x) c(x, x[3]))()
+
+  indicator <- df$X3 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
+    stringr::str_replace_all(
+      pattern = "\\s{2}Compliance", replacement = ";;Compliance"
+    ) |>
+    stringr::str_replace_all(pattern = "\\s{2}", replacement = " ") |>
+    stringr::str_split(pattern = ";;") |>
+    unlist() |>
+    (\(x) c("", x))()
+
+  df_targets <- lapply(
+    X = df[ , c("X4", "X5", "X6", "X7", "X8", "X9")], 
+    FUN = get_indicator_targets
+  ) |> 
+    do.call(cbind, args = _) |>
+    data.frame() |>
+    setNames(
+      nm = c(
+        "baseline", "target_2022", "target_2023", "target_2024", 
+        "target_2025", "target_2026")
+    ) |>
+    (\(x) rbind(rep("", 6), x))()
+
+  data_sources <- df$X10 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
+    stringr::str_replace_all(pattern = "\\s{2,}", replacement = " ") |>
+    stringr::str_replace_all(pattern = "\\sSQA", replacement = "; SQA") |>
+    stringr::str_split(pattern = ";;") |>
+    unlist() |>
+    (\(x) c("", x))()
+  
+  responsible <- df$X11 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_split(pattern = "\\s{3,}") |>
+    lapply(
+      FUN = stringr::str_replace_all, pattern = "\\s{2}", replacement = " "
+    ) |>
+    unlist() |>
+    (\(x) c("", x))()
+
+  indicator_protocol <- df$X12 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_replace_all(pattern = "\\s{2,}", replacement = " ") |>
+    stringr::str_replace_all(
+      pattern = "\\sMonitoring", replacement = ";;Monitoring"
+    ) |>
+    stringr::str_replace_all(
+      pattern = "\\sCompliance", replacement = ";;Compliance"
+    ) |>
+    stringr::str_replace_all(pattern = "\\s,", replacement = ",") |>
+    stringr::str_replace_all(pattern = ", ", replacement = "; ") |>
+    stringr::str_split(pattern = ";;") |>
+    unlist() |>
+    (\(x) c("", x))()
+
+  tibble::tibble(
+    key_sector_challenge, strategic_objective, indicator,
+    df_targets, data_sources, responsible, indicator_protocol
+  )
+}
+
+
+#'
+#' Read SQA strategic results page 8
+#' 
+
+read_sqa_strategy_results_p8 <- function(df_text) {
+  ptext <- df_text[[8]] |>
+    remove_extra_lines() |>
+    stringr::str_replace_all(pattern = "^\\s{41}", replacement = ";;") |>
+    #stringr::str_replace_all(pattern = "^\\s{17}", replacement = ";") |>
+    stringr::str_replace_all(pattern = "\\s{132,}", replacement = ";;;;;;;;;;;") |>
+    #stringr::str_replace_all(pattern = "\\s{118,}", replacement = ";;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "\\s{90,}", replacement = ";;;;;;;;;") |>
+    #stringr::str_replace_all(pattern = "\\s{68,}", replacement = ";;;;;;;;") |>
+    stringr::str_replace_all(pattern = "\\s{50,}", replacement = ";;;;;;;") |>
+    stringr::str_replace_all(pattern = "\\s{24,}", replacement = ";;") |>
+    stringr::str_replace_all(pattern = "\\s{2,}", replacement = ";") |>
+    stringr::str_replace_all(pattern = "developed and$", replacement = "developed and;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "^;;implemented$", replacement = ";;implemented;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "media$", replacement = "media;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = ";;year$", replacement = ";;year;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "records$", replacement = "records;;") |>
+    stringr::str_replace_all(pattern = "page$", replacement = "page;;") |>
+    stringr::str_split(pattern = ";")
+
+  df <- ptext |>
+    do.call(rbind, args = _) |>
+    data.frame()
+
+  key_sector_challenge <- df$X1 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    (\(x) c("", x, x, x))()
+
+  strategic_objective <- df$X2 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    (\(x) c("", x, x, x))()
+
+  indicator <- df$X3 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
+    stringr::str_replace_all(
+      pattern = "\\sNumber", replacement = ";;Number"
+    ) |>
+    stringr::str_replace_all(pattern = "\\sSQA", replacement = ";;SQA") |>
+    stringr::str_replace_all(pattern = "\\sNumber", replacement = ";;Number") |>
+    stringr::str_replace_all(
+      pattern = "\\sReviewed", replacement = ";;Reviewed"
+    ) |>
+    stringr::str_replace_all(pattern = "\\sThe", replacement = ";;The") |>
+    stringr::str_split(pattern = ";;") |>
+    unlist() |>
+    (\(x) c("", x))()
+
+  df_targets <- lapply(
+    X = df[ , c("X4", "X5", "X6", "X7", "X8", "X9")], 
+    FUN = get_indicator_targets
+  ) |> 
+    do.call(cbind, args = _) |>
+    data.frame() |>
+    setNames(
+      nm = c(
+        "baseline", "target_2022", "target_2023", "target_2024", 
+        "target_2025", "target_2026")
+    ) |>
+    (\(x) rbind(rep("", 6), x))()
+
+  data_sources <- df$X10 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
+    stringr::str_replace_all(
+      pattern = "\\sCabinet", replacement = ";;Cabinet"
+    ) |>
+    stringr::str_replace_all(
+      pattern = "\\sRecruitment", replacement = ";;Recruitment"
+    ) |>
+    stringr::str_split(pattern = ";;") |>
+    unlist() |>
+    (\(x) c("", x))()
+  
+  responsible <- df$X11 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_split(pattern = "\\s{3,}") |>
+    lapply(
+      FUN = stringr::str_replace_all, pattern = "\\s{2}", replacement = " "
+    ) |>
+    unlist() |>
+    (\(x) c("", x))()
+
+  indicator_protocol <- df$X12 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
+    stringr::str_replace_all(
+      pattern = "\\sConducive", replacement = ";;Conducive"
+    ) |>
+    stringr::str_replace_all(pattern = "\\sAnnual", replacement = ";;Annual") |>
+    stringr::str_replace_all(
+      pattern = "\\s{2}Improved", replacement = "; Improved"
+    ) |>
+    stringr::str_replace_all(
+      pattern = "\\sPublished", replacement = ";;Published"
+    ) |>
+    stringr::str_replace_all(
+      pattern = "\\s{2}Registration", replacement = ";;Registration"
+    ) |>
+    stringr::str_replace_all(pattern = "\\s{2}", replacement = "") |>
+    stringr::str_replace_all(pattern = "a l", replacement = "al") |>
+    stringr::str_split(pattern = ";;") |>
+    unlist()    
+
+  tibble::tibble(
+    key_sector_challenge, strategic_objective, indicator,
+    df_targets, data_sources, responsible, indicator_protocol
+  )
+}
+
+
+#'
+#' Read SQA strategic results page 6
+#' 
+
+read_sqa_strategy_results_p6 <- function(df_text) {
+  ptext <- df_text[[6]] |>
+    remove_extra_lines() |>
+    stringr::str_replace_all(pattern = "^\\s{144}", replacement = ";;;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "^\\s{110}", replacement = ";;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "^\\s{44}", replacement = ";;") |>
+    stringr::str_replace_all(pattern = "^\\s{17}", replacement = ";") |>
+    stringr::str_replace_all(pattern = "\\s{103,}", replacement = ";;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "\\s{83,}", replacement = ";;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "\\s{66,}", replacement = ";;;;;;;;") |>
+    stringr::str_replace_all(pattern = "\\s{48,}", replacement = ";;;;;;;") |>
+    stringr::str_replace_all(pattern = "\\s{23,}", replacement = ";;") |>
+    stringr::str_replace_all(pattern = "\\s{2,}", replacement = ";") |>
+    stringr::str_replace_all(pattern = "incorporated$", replacement = "incorporated;;;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "education and$", replacement = "education and;;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "providers and$", replacement = "providers and;;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "processes of$", replacement = "processes of;;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "inspection,$", replacement = "inspection,;;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "institutional$", replacement = "institutional;;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "accreditation and$", replacement = "accreditation and;;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "year$", replacement = "year;;;;;;;;;") |>
+    stringr::str_replace_all(pattern = "records$", replacement = "records;;") |>
+    stringr::str_split(pattern = ";")
+
+  df <- ptext |>
+    do.call(rbind, args = _) |>
+    data.frame()
+
+  key_sector_challenge <- df$X1 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
+    stringr::str_replace_all(pattern = "\\s{2}", replacement = "\\s") |>
+    stringr::str_split(pattern = ";;") |>
+    unlist() |>
+    (\(x) c(x[1], x[1], x[1], x[1], x[2]))()
+
+  strategic_objective <- df$X2 |>
+    paste(collapse = " ") |>
+    stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
+    stringr::str_replace_all(pattern = "\\s{2}", replacement = "\\s") |>
+    stringr::str_split(pattern = ";;") |>
+    unlist() |>
+    (\(x) c(x[1], x[1], x[1], x[1], x[2]))()
+
+  indicator <- df$X3 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
+    stringr::str_replace_all(
+      pattern = "\\s{2}Number", replacement = ";;Number"
+    ) |>
+    stringr::str_replace_all(pattern = "\\s{2}", replacement = " ") |>
+    stringr::str_split(pattern = ";;") |>
+    unlist()
+
+  df_targets <- lapply(
+    X = df[ , c("X4", "X5", "X6", "X7", "X8", "X9")], 
+    FUN = get_indicator_targets
+  ) |> 
+    do.call(cbind, args = _) |>
+    data.frame() |>
+    setNames(
+      nm = c(
+        "baseline", "target_2022", "target_2023", "target_2024", 
+        "target_2025", "target_2026")
+    ) |>
+    (\(x) rbind(rep("", 6), x))()
+
+  data_sources <- df$X10 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
+    stringr::str_replace_all(pattern = "\\s{2}Survey instruments", replacement = ";;Survey instruments") |>
+    stringr::str_replace_all(pattern = "\\s{2}|, ", replacement = "; ") |>
+    stringr::str_split(pattern = ";;") |>
+    unlist() |>
+    (\(x) c("", x))()
+  
+  responsible <- df$X11 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_split(pattern = "\\s{3,}") |>
+    unlist() |>
+    (\(x) c("", x))()
+
+  indicator_protocol <- df$X12 |>
+    paste(collapse = " ") |>
+    trimws() |>
+    stringr::str_replace_all(pattern = "\\s{3,}", replacement = ";;") |>
+    stringr::str_replace_all(
+      pattern = "\\sImproved", replacement = ";;Improved"
+    ) |>
+    stringr::str_replace_all(pattern = "\\sAnnual", replacement = "; Annual") |>
+    stringr::str_split(pattern = ";;") |>
+    unlist() |>
+    (\(x) c("", x))()
+
+  tibble::tibble(
+    key_sector_challenge, strategic_objective, indicator,
+    df_targets, data_sources, responsible, indicator_protocol
+  )
+}
+
+
+#'
+#' 
+#' 
+
 remove_extra_lines <- function(p) {
   p |>
     (\(x) x[!grepl(pattern = "^\\s{2,}Table", x = x)])() |>
@@ -638,6 +986,11 @@ remove_extra_lines <- function(p) {
     (\(x) x[!grepl(pattern = "^\\s{2,}The Seychelles Qualifications Authority Strategic Plan", x = x)])() |>
     (\(x) x[x != ""])()
 }
+
+
+#'
+#' 
+#' 
 
 get_indicator_targets <- function(x) {
   x |>
