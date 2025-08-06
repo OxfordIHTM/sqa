@@ -1,21 +1,3 @@
-
-pdf <- sqa_strat_plan_pdf
-df_text <- pdftools::pdf_text(pdf) |>
-    (\(x) x[32:49])() |>
-    stringr::str_split(pattern = "\n")
-
-get_start_line <- function(x) {
-  grep(pattern = "[0-9]{1}\\.[0-9]{1,2}\\.[0-9]{1,2}\\.", x = x) |>
-    (\(x) x[1])()
-}
-
-get_end_line <- function(x) {
-  grep(
-    pattern = "The Seychelles Qualifications Authority Strategic Plan (2022-2026)", 
-    x = x
-  )
-}
-
 #'
 #' Read SQA strategic plan implementation page 1
 #' 

@@ -1,6 +1,3 @@
-
-pdf <- sqa_strat_plan_pdf
-
 #'
 #' Read SQA strategic plan implementation page 4
 #' 
