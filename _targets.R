@@ -18,7 +18,8 @@ processing_targets <- tar_plan(
     command = read_sqa_strategy(pdf = sqa_strat_plan_pdf)
   ),
   tar_target(
-    name = sqa_strat_priority, command = get_sqa_strat_priority(sqa_strat_plan)
+    name = sqa_strat_priority, 
+    command = get_sqa_strat_priority(sqa_strat_plan)
   ),
   tar_target(
     name = sqa_strat_objective,
