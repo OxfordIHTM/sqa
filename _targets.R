@@ -23,6 +23,12 @@ processing_targets <- tar_plan(
   tar_target(
     name = sqa_strat_objective,
     command = get_sqa_strat_objective(sqa_strat_plan)
+  ),
+  tar_target(
+    name = sqa_strat_results,
+    command = read_sqa_strategy_results(
+      pdf = sqa_strat_plan_pdf, sqa_strat_objective
+    )
   )
 )
 
@@ -53,6 +59,13 @@ output_targets <- tar_plan(
     name = sqa_strat_objective_csv,
     command = write_as_csv(
       df = sqa_strat_objective, path = "data/sqa_strat_objective.csv"
+    ),
+    format = "file"
+  ),
+  tar_target(
+    name = sqa_strat_results_csv,
+    command = write_as_csv(
+      df = sqa_strat_results, path = "data/sqa_strat_results.csv"
     ),
     format = "file"
   )
