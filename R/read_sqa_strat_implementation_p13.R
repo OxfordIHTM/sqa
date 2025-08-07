@@ -92,7 +92,8 @@ read_sqa_strategy_implementation_p13 <- function(df_text) {
     stringr::str_replace_all(
       pattern = " Quarterly", replacement = ";;Quarterly"
     ) |>
-    stringr::str_split(pattern = ";;")
+    stringr::str_split(pattern = ";;") |>
+    unlist()
   
   tibble::tibble(
     outcome, strategy_code, strategy, performance_indicator, target,
