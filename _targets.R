@@ -18,7 +18,8 @@ processing_targets <- tar_plan(
     command = read_sqa_strategy(pdf = sqa_strat_plan_pdf)
   ),
   tar_target(
-    name = sqa_strat_priority, command = get_sqa_strat_priority(sqa_strat_plan)
+    name = sqa_strat_priority, 
+    command = get_sqa_strat_priority(sqa_strat_plan)
   ),
   tar_target(
     name = sqa_strat_objective,
@@ -29,6 +30,10 @@ processing_targets <- tar_plan(
     command = read_sqa_strategy_results(
       pdf = sqa_strat_plan_pdf, sqa_strat_objective
     )
+  ),
+  tar_target(
+    name = sqa_strat_implementation,
+    command = read_sqa_strategy_implementation(pdf = sqa_strat_plan_pdf)
   )
 )
 
@@ -66,6 +71,13 @@ output_targets <- tar_plan(
     name = sqa_strat_results_csv,
     command = write_as_csv(
       df = sqa_strat_results, path = "data/sqa_strat_results.csv"
+    ),
+    format = "file"
+  ),
+  tar_target(
+    name = sqa_strat_implementation_csv,
+    command = write_as_csv(
+      df = sqa_strat_implementation, path = "data/sqa_strat_implementation.csv"
     ),
     format = "file"
   )
