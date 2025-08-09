@@ -89,13 +89,17 @@ read_sqa_strategy_implementation_p7 <- function(df_text) {
     paste(collapse = " ") |>
     trimws() |>
     stringr::str_replace_all(
-      pattern = "\\s{1,}Reviewed", replacement = ";Reviewed" 
+      pattern = "another Reviewed", replacement = "another;;Reviewed"
     ) |>
     stringr::str_replace_all(
-      pattern = "\\s{1,}The reviewed", replacement = ";The reviewed" 
+      pattern = "\\s{2,}Reviewed", replacement = "; Reviewed" 
+    ) |>
+    stringr::str_replace_all(
+      pattern = "\\s{2,}The reviewed", replacement = ";;The reviewed" 
     ) |>    
-    stringr::str_split(pattern = ";") |>
-    unlist()
+    stringr::str_split(pattern = ";;") |>
+    unlist() |>
+    (\(x) c(x[1:2], x[2], x[4]))()
 
   strategy_code <- stringr::str_extract(
     string = df$X2, pattern = "[0-9]{1}\\.[0-9]{1,2}\\.[0-9]{1,2}\\."
