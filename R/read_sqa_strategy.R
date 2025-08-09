@@ -148,11 +148,13 @@ read_sqa_strategy_p <- function(df_text) {
     stringr::str_remove_all(
       pattern = "^[0-9]{1,}\\.[0-9]{1,}\\.[0-9]{1,}\\. |^[0-9]{1,}\\.[0-9]{1,}\\.[0-9]{1,} "
     ) |>
+    (\(x) x[x != ""])() |>
     stringr::str_replace(
       pattern = "Accredit national programmes of study",
       replacement = "Accredit national programmes of study."
     ) |>
     paste(collapse = " ") |>
+    trimws() |>
     stringr::str_replace_all(pattern = "\\. ", replacement = ".;") |>
     stringr::str_split(pattern = ";") |>
     unlist()
