@@ -20,7 +20,10 @@ read_sqa_strategy_results <- function(pdf, sqa_strat_objective) {
 
   p1p2p3 <- rbind(p1p2, p3)
 
-  row8 <- lapply(X = p1p2p3[8:9, ], FUN = paste, collapse = "") |>
+  row8 <- lapply(
+    X = p1p2p3[8:9, ], 
+    FUN = function(x) paste(x, collapse = " ") |> trimws()
+  ) |>
     dplyr::bind_cols()
 
   p1p2p3 <- p1p2p3[1:7, ] |>
@@ -30,28 +33,28 @@ read_sqa_strategy_results <- function(pdf, sqa_strat_objective) {
   p1p2p3p4 <- rbind(p1p2p3, p4)
 
   row14 <- rbind(p1p2p3p4[14, ], p5[1, ]) |>
-    lapply(FUN = paste, collapse = "") |>
+    lapply(FUN = function(x) paste(x, collapse = " ") |> trimws()) |>
     dplyr::bind_cols()
 
   p1p2p3p4p5 <- rbind(p1p2p3p4[1:13, ], row14) |>
     rbind(p5[2:nrow(p5), ])
 
   row20 <- rbind(p1p2p3p4p5[20, ], p6[1, ]) |>
-    lapply(FUN = paste, collapse = "") |>
+    lapply(FUN = function(x) paste(x, collapse = " ") |> trimws()) |>
     dplyr::bind_cols()
 
   p1p2p3p4p5p6 <- rbind(p1p2p3p4p5[1:19, ], row20) |>
     rbind(p6[2:nrow(p6), ])
 
   row24 <- rbind(p1p2p3p4p5p6[24, ], p7[1, ]) |>
-    lapply(FUN = paste, collapse = "") |>
+    lapply(FUN = function(x) paste(x, collapse = " ") |> trimws()) |>
     dplyr::bind_cols()
 
   p1p2p3p4p5p6p7 <- rbind(p1p2p3p4p5p6[1:23, ], row24) |>
     rbind(p7[2:nrow(p7), ])
 
   row27 <- rbind(p1p2p3p4p5p6p7[27, ], p8[1, ]) |>
-    lapply(FUN = paste, collapse = "") |>
+    lapply(FUN = function(x) paste(x, collapse = " ") |> trimws()) |>
     dplyr::bind_cols()
 
   p1p2p3p4p5p6p7p8 <- rbind(p1p2p3p4p5p6p7[1:26, ], row27) |>
@@ -619,7 +622,7 @@ read_sqa_strategy_results_p6 <- function(df_text) {
     stringr::str_replace_all(pattern = "\\s{2}", replacement = " ") |>
     stringr::str_split(pattern = ";;") |>
     unlist() |>
-    (\(x) c(x[1], x[1], x[1], x[1], x[2]))()
+    (\(x) c(x[1], "", "", "", x[2]))()
 
   strategic_objective <- df$X2 |>
     paste(collapse = " ") |>
